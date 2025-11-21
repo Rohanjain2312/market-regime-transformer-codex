@@ -187,7 +187,7 @@ def download_macro_data(series: List[str], start: str, end: Optional[str], cache
 # --------------------------------------------------------------------------- #
 # Merge logic
 # --------------------------------------------------------------------------- #
-def _merge_price_macro(prices: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFrame:
+def _merge_price_macro(prices: pd.DataFrame, macro: pd.DataFrame, min_rows: int = 1000) -> pd.DataFrame:
     """Merge price and macro data safely with validation."""
     prices = prices.sort_index()
     macro = macro.sort_index()
@@ -216,8 +216,8 @@ def _merge_price_macro(prices: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFram
     if merged.index.has_duplicates:
         raise ValueError("Merged DataFrame has duplicate index entries.")
 
-    if len(merged) < 1000:
-        raise ValueError(f"Merged DataFrame too short: {len(merged)} rows (<1000).")
+    if len(merged) < min_rows:
+        raise ValueError(f"Merged DataFrame too short: {len(merged)} rows (<{min_rows}).")
 
     return merged
 
@@ -250,7 +250,8 @@ def load_data(cfg: Optional[Config] = None) -> pd.DataFrame:
 
     prices = download_price_data(tickers, start_date, end_date, raw_dir)
     macro = download_macro_data(macro_series, start_date, end_date, raw_dir)
-    merged = _merge_price_macro(prices, macro)
+    min_rows = getattr(cfg, "min_merge_rows", 1000)
+    merged = _merge_price_macro(prices, macro, min_rows=min_rows)
 
     _save_cached(merged, merged_csv, merged_meta, merge_checksum)
     logger.info("Saved merged dataset to %s", merged_csv)
