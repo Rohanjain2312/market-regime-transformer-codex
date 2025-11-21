@@ -34,7 +34,12 @@ def download_price_data(
         return pd.read_csv(cache_path, parse_dates=["Date"], index_col="Date")
 
     end_date = end or dt.date.today().isoformat()
-    data = yf.download(tickers, start=start, end=end_date, progress=False)["Adj Close"]
+    data = yf.download(
+    tickers,
+    start=start,
+    end=end_date,
+    progress=False,
+    auto_adjust=True)["Close"]
     if isinstance(data, pd.DataFrame) and isinstance(data.columns, pd.MultiIndex):
         data.columns = data.columns.get_level_values(0)
     data = data.dropna(how="all").sort_index()
