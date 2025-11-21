@@ -1,0 +1,14 @@
+tqdm
+numpy
+pandas
+yfinance
+pandas_datareader
+quandl
+torch
+torchvision
+torchaudio
+torchmetrics
+scikit-learn
+matplotlib
+seaborn
+optuna
