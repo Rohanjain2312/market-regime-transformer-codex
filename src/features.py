@@ -89,10 +89,11 @@ def build_feature_windows(
     labels = regime_labels(rolling_60d_return, threshold=regime_threshold)
     next_day_return = daily_returns.shift(-1)
 
-    target_df = pd.DataFrame(
-        {"next_return": next_day_return, "regime": labels}, index=feat_df.index
-    )
-    combined = pd.concat([feat_df, target_df], axis=1).dropna()
+    # Attach targets directly to avoid concat/join index validation issues
+    feat_df = feat_df.copy()
+    feat_df["next_return"] = next_day_return
+    feat_df["regime"] = labels
+    combined = feat_df.dropna()
 
     lookback = cfg.lookback_window
     feature_cols = [col for col in combined.columns if col not in {"next_return", "regime"}]
