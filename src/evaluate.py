@@ -113,7 +113,7 @@ def evaluate_model(cfg: Config, checkpoint_path: Path) -> Tuple[Dict[str, float]
     cls_true_arr = np.concatenate(cls_true).flatten()
 
     mae = mean_absolute_error(reg_true_arr, reg_preds_arr)
-    rmse = mean_squared_error(reg_true_arr, reg_preds_arr, squared=False)
+    rmse = float(np.sqrt(mean_squared_error(reg_true_arr, reg_preds_arr)))
     dir_acc = directional_accuracy(reg_preds_arr, reg_true_arr)
     acc = accuracy_score(cls_true_arr, cls_preds_arr)
     f1 = f1_score(cls_true_arr, cls_preds_arr, average="macro")
